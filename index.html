@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tic Tac Toe | Developed by Thangapandi</title>
+
+<style>
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(135deg,#111827,#1e3a8a,#0f172a);
+    overflow:hidden;
+}
+
+body::before{
+    content:"";
+    position:absolute;
+    width:600px;
+    height:600px;
+    border-radius:50%;
+    background:rgba(255,255,255,.05);
+    filter:blur(80px);
+}
+
+.container{
+    width:420px;
+    max-width:95%;
+    background:rgba(255,255,255,.08);
+    backdrop-filter:blur(15px);
+    border:1px solid rgba(255,255,255,.2);
+    border-radius:25px;
+    padding:25px;
+    text-align:center;
+    color:#fff;
+    box-shadow:0 20px 60px rgba(0,0,0,.5);
+}
+
+h1{
+    font-size:2rem;
+    margin-bottom:10px;
+}
+
+.dev{
+    color:#7dd3fc;
+    font-size:.95rem;
+    margin-bottom:20px;
+}
+
+.status{
+    font-size:1.2rem;
+    margin-bottom:20px;
+    font-weight:bold;
+}
+
+.board{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:12px;
+}
+
+.cell{
+    aspect-ratio:1;
+    border:none;
+    border-radius:20px;
+    background:rgba(255,255,255,.1);
+    color:white;
+    font-size:3rem;
+    font-weight:bold;
+    cursor:pointer;
+    transition:.25s;
+}
+
+.cell:hover{
+    transform:scale(1.05);
+    background:#2563eb;
+}
+
+.cell.x{
+    color:#22c55e;
+}
+
+.cell.o{
+    color:#f43f5e;
+}
+
+.controls{
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:25px;
+}
+
+button.control{
+    padding:12px 18px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    font-weight:bold;
+    transition:.3s;
+}
+
+button.control:hover{
+    transform:translateY(-2px);
+}
+
+.reset{
+    background:#22c55e;
+    color:white;
+}
+
+.new{
+    background:#3b82f6;
+    color:white;
+}
+
+.score{
+    display:flex;
+    justify-content:space-around;
+    margin:20px 0;
+    font-size:18px;
+}
+
+.footer{
+    margin-top:20px;
+    opacity:.8;
+    font-size:14px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+
+<h1>🎮 Tic Tac Toe</h1>
+<div class="dev">Developed by <b>Thangapandi</b></div>
+
+<div class="score">
+<div>X : <span id="xScore">0</span></div>
+<div>O : <span id="oScore">0</span></div>
+<div>Draw : <span id="drawScore">0</span></div>
+</div>
+
+<div class="status" id="status">
+Player X Turn
+</div>
+
+<div class="board" id="board">
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+<button class="cell"></button>
+</div>
+
+<div class="controls">
+<button class="control reset" onclick="resetBoard()">
+Reset Board
+</button>
+
+<button class="control new" onclick="newGame()">
+New Game
+</button>
+</div>
+
+<div class="footer">
+Made with ❤️ by Thangapandi
+</div>
+
+</div>
+
+<script>
+
+const cells=document.querySelectorAll(".cell");
+const statusText=document.getElementById("status");
+
+let currentPlayer="X";
+let gameRunning=true;
+
+let board=["","","","","","","","",""];
+
+let xScore=0;
+let oScore=0;
+let drawScore=0;
+
+const wins=[
+[0,1,2],
+[3,4,5],
+[6,7,8],
+[0,3,6],
+[1,4,7],
+[2,5,8],
+[0,4,8],
+[2,4,6]
+];
+
+cells.forEach((cell,index)=>{
+cell.addEventListener("click",()=>cellClick(index));
+});
+
+function cellClick(index){
+
+if(board[index]!="" || !gameRunning) return;
+
+board[index]=currentPlayer;
+
+cells[index].textContent=currentPlayer;
+cells[index].classList.add(currentPlayer.toLowerCase());
+
+checkWinner();
+
+}
+
+function checkWinner(){
+
+let winner=false;
+
+wins.forEach(pattern=>{
+
+const[a,b,c]=pattern;
+
+if(board[a] &&
+board[a]==board[b] &&
+board[b]==board[c]){
+
+winner=true;
+
+cells[a].style.background="#16a34a";
+cells[b].style.background="#16a34a";
+cells[c].style.background="#16a34a";
+
+}
+
+});
+
+if(winner){
+
+statusText.textContent="🏆 Player "+currentPlayer+" Wins!";
+
+gameRunning=false;
+
+if(currentPlayer=="X"){
+xScore++;
+document.getElementById("xScore").textContent=xScore;
+}
+else{
+oScore++;
+document.getElementById("oScore").textContent=oScore;
+}
+
+return;
+}
+
+if(!board.includes("")){
+
+statusText.textContent="🤝 Match Draw";
+
+drawScore++;
+document.getElementById("drawScore").textContent=drawScore;
+
+gameRunning=false;
+return;
+
+}
+
+currentPlayer=currentPlayer=="X"?"O":"X";
+
+statusText.textContent="Player "+currentPlayer+" Turn";
+
+}
+
+function resetBoard(){
+
+board=["","","","","","","","",""];
+
+cells.forEach(cell=>{
+
+cell.textContent="";
+cell.className="cell";
+cell.style.background="rgba(255,255,255,.1)";
+
+});
+
+currentPlayer="X";
+gameRunning=true;
+
+statusText.textContent="Player X Turn";
+
+}
+
+function newGame(){
+
+xScore=0;
+oScore=0;
+drawScore=0;
+
+document.getElementById("xScore").textContent=0;
+document.getElementById("oScore").textContent=0;
+document.getElementById("drawScore").textContent=0;
+
+resetBoard();
+
+}
+
+</script>
+
+</body>
+</html>
